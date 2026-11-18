@@ -4,6 +4,10 @@ const props = defineProps({
     type: String,
     default: 'info',
   },
+  message: {
+    type: String,
+    default: 'info',
+  }
 })
 
 const classes = {
@@ -19,6 +23,6 @@ const classes = {
     class="rounded-xl border px-4 py-3 text-sm"
     :class="classes[props.type] || classes.info"
   >
-    <slot />
+    {{ message }}
   </div>
 </template>

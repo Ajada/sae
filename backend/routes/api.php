@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Http\Request;
 use App\Http\Controllers\Api\ApiClientController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ContactController;
@@ -12,8 +13,11 @@ use App\Http\Controllers\Api\MessageTemplateController;
 use App\Http\Controllers\Api\PublicReminderActionController;
 use App\Http\Controllers\Api\ReminderDueDateController;
 use App\Http\Controllers\Api\ReminderItemController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\ManagedCompanyController;
+use App\Http\Controllers\Api\CompanyTeamController;
+use App\Models\Employee;
+use App\Models\EmploymentLink;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -72,6 +76,14 @@ Route::prefix('v1')->group(function () {
         );
 
         Route::apiResource('message-schedules', MessageScheduleController::class);
+
+        Route::apiResource('managed-companies', ManagedCompanyController::class);
+
+        Route::get('/team-members', [CompanyTeamController::class, 'indexFlat']);
+        Route::post('/team-members', [CompanyTeamController::class, 'storeFlat']);
+        Route::post('/team-members/{employee}/links', [CompanyTeamController::class, 'addLinkFlat']);
+        Route::patch('/employment-links/{employmentLink}', [CompanyTeamController::class, 'updateLinkFlat']);
+        Route::put('/employment-links/{employmentLink}', [CompanyTeamController::class, 'updateLinkFlat']);
 
     });
 

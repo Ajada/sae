@@ -1,5 +1,6 @@
 import authRoutes from '@/modules/auth/routes'
 import dashboardRoutes from '@/modules/dashboard/routes'
+import managedCompanyRoutes from '@/modules/managed-companies/routes'
 import contactRoutes from '@/modules/contacts/routes'
 
 import PublicLayout from '@/layouts/PublicLayout.vue'
@@ -32,6 +33,7 @@ export const routes = [
     children: [
       ...dashboardRoutes,
       ...contactRoutes,
+      ...managedCompanyRoutes,
     ],
   },
 ]

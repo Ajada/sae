@@ -27,7 +27,7 @@ export const navigation = [
     items: [
       {
         label: 'EMPRESAS',
-        name: 'contacts.index',
+        name: 'managed-companies',
         icon: PhBuildingOffice,
       },
       {
