@@ -3,11 +3,10 @@ import {
   PhBuildingOffice,
   PhCalendarCheck,
   PhChartBar,
-  PhEnvelopeSimple,
+  PhFileDoc,
   PhGearSix,
   PhHouse,
   PhKey,
-  PhUsers,
 } from '@phosphor-icons/vue'
 
 export const navigation = [
@@ -31,10 +30,9 @@ export const navigation = [
         icon: PhBuildingOffice,
       },
       {
-        label: 'Mensagens',
-        name: 'messages.index',
-        icon: PhEnvelopeSimple,
-        disabled: true,
+        label: 'ASOs',
+        name: 'aso-monitoring',
+        icon: PhFileDoc,
       },
       {
         label: 'Vencimentos',

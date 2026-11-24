@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\ManagedCompanyController;
 use App\Http\Controllers\Api\CompanyTeamController;
 use App\Http\Controllers\Api\TeamImportController;
 use App\Http\Controllers\Api\AsoOperationsController;
+use App\Http\Controllers\Api\AsoSpreadsheetImportController;
 use App\Models\Employee;
 use App\Models\EmploymentLink;
 
@@ -98,6 +99,11 @@ Route::prefix('v1')->group(function () {
             '/managed-companies/{managed_company}/team-imports/{team_import_batch}/corrections',
             [TeamImportController::class, 'corrections']
         );
+
+        Route::post('/managed-companies/{managedCompany}/team-imports/{teamImportBatch}/asos/preview',
+            [AsoSpreadsheetImportController::class, 'preview']);
+        Route::post('/managed-companies/{managedCompany}/team-imports/{teamImportBatch}/asos/commit',
+            [AsoSpreadsheetImportController::class, 'commit']);
 
     });
 

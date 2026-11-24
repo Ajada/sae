@@ -33,8 +33,10 @@ const isOpen = defineModel({
         </div>
 
         <nav class="flex-1 overflow-y-auto px-4 py-5">
-          <div class="space-y-1">
-            <template v-for="item in group.items" :key="item.label">
+          <div class="space-y-5">
+            <div v-for="group in navigation" :key="group.label" class="space-y-1">
+              <p class="px-3 pb-2 text-xs font-bold uppercase tracking-widest text-app-muted">{{ group.label }}</p>
+              <template v-for="item in group.items" :key="item.label">
               <div
                 v-if="item.disabled"
                 class="flex cursor-not-allowed items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-semibold text-app-muted/50"
@@ -61,7 +63,8 @@ const isOpen = defineModel({
 
                 <span>{{ item.label }}</span>
               </RouterLink>
-            </template>
+              </template>
+            </div>
           </div>
         </nav>
       </aside>

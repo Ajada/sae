@@ -54,6 +54,9 @@ class TeamImportController extends Controller
             Storage::disk('local')->delete($path);
             throw ValidationException::withMessages(['file'=> 'Não foi possível ler a planilha: '.$e->getMessage()]);
         }
+        $previous = TeamImportBatch::where('company_id', $company->company_id)
+            ->where('managed_company_id', $company->id)
+            ->where('status', 'committed')->latest('committed_at')->first();
         $batch = TeamImportBatch::create([
             'company_id'=>$company->company_id, 'managed_company_id'=>$company->id, 'user_id'=>auth()->id(),
             'original_name'=>mb_substr($uploaded->getClientOriginalName(), 0, 255), 'stored_path'=>$path,
@@ -63,7 +66,8 @@ class TeamImportController extends Controller
         return response()->json([
             'batch_uuid'=>$batch->uuid,'sheet'=>$sheet['sheet'],'headers'=>$sheet['headers'],
             'suggested_mapping'=>$reader->suggest($sheet['headers']),
-            'records_count'=>count($sheet['records']), 'expires_at'=>$batch->expires_at,
+            'records_count'=>count($sheet['records']), 'expires_at'=>$batch->expires_at, 'sha256'=>$batch->sha256,
+            'previous_import'=> $previous ? ['original_name'=>$previous->original_name, 'committed_at'=>$previous->committed_at] : null,
         ],201);
     }
 
@@ -177,7 +181,7 @@ class TeamImportController extends Controller
             return $counts;
         }, 3);
         $logger->log('team_import.committed', $batch, newValues: $result, companyId:$company->company_id);
-        Storage::disk('local')->delete($batch->stored_path);
+        // Preservar o arquivo até a expiração do lote para a etapa de importação de ASOs.
         return response()->json(['message'=>'Importação concluída.','result'=>$result,'aso_imported'=>0]);
     }
 }

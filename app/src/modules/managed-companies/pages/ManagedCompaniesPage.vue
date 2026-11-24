@@ -11,12 +11,14 @@ import BaseAlert from '@/shared/components/feedback/BaseAlert.vue'
 import LoadingSpinner from '@/shared/components/feedback/LoadingSpinner.vue'
 import ManagedCompanyDrawer from '../components/ManagedCompanyDrawer.vue'
 import { useManagedCompanyStore } from '../stores/managedCompany.store'
+import SaeViewToggle from '../components/SaeViewToggle.vue'
 
 const store = useManagedCompanyStore()
 const router = useRouter()
 const isDrawerOpen = ref(false)
 const editingCompany = ref(null)
 const search = ref('')
+const viewMode = ref('table')
 const pageError = ref(null)
 const notice = ref(null)
 const companies = computed(() => store.items ?? [])
@@ -110,6 +112,7 @@ function openTeam(company) {
           <BaseInput v-model="search" placeholder="Buscar por razão social, fantasia ou CNPJ..." class="flex-1" />
           <BaseButton type="submit" variant="secondary" :disabled="store.isLoading"><PhMagnifyingGlass class="h-4 w-4" /> Buscar</BaseButton>
         </form>
+        <SaeViewToggle v-model="viewMode" />
       </div>
 
       <BaseAlert v-if="store.error || pageError" class="mt-5" type="danger" :message="store.error || pageError" />
@@ -122,7 +125,16 @@ function openTeam(company) {
         <p class="mt-2 max-w-md text-sm text-app-muted">Cadastre uma empresa para iniciar o acompanhamento de sua equipe.</p>
         <BaseButton class="mt-5" @click="openCreate"><PhPlus class="h-4 w-4" /> Cadastrar empresa</BaseButton>
       </div>
-      <div v-else class="mt-5 overflow-hidden rounded-2xl border border-app-border">
+      <div v-else-if="viewMode === 'cards'" class="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <article v-for="company in companies" :key="keyOf(company)" class="sae-company-card rounded-2xl border border-app-border bg-app-surface p-5 shadow-sm">
+          <div class="mb-4 flex items-start justify-between gap-3"><div class="min-w-0"><h3 class="break-words font-bold text-app-text">{{ company.trade_name || company.corporate_name }}</h3><p class="mt-1 text-xs text-app-muted">{{ company.corporate_name }}</p></div>
+            <span class="rounded-full px-2.5 py-1 text-xs font-semibold" :class="company.is_active ? 'bg-app-success/10 text-app-success' : 'bg-app-muted/10 text-app-muted'">{{ company.is_active ? 'Ativa' : 'Inativa' }}</span>
+          </div>
+          <dl class="space-y-2 text-sm"><div class="flex justify-between gap-2"><dt class="text-app-muted">CNPJ</dt><dd class="text-app-text">{{ cnpjDisplay(company.cnpj) }}</dd></div><div class="flex justify-between gap-2"><dt class="text-app-muted">Grau de risco</dt><dd class="font-semibold text-app-text">{{ company.risk_grade }}</dd></div></dl>
+          <div class="mt-5 flex flex-wrap gap-2 border-t border-app-border pt-4"><BaseButton size="sm" @click="openTeam(company)">Equipe</BaseButton><BaseButton size="sm" variant="secondary" @click="openEdit(company)">Editar</BaseButton><BaseButton size="sm" variant="secondary" @click="handleArchive(company)">Arquivar</BaseButton></div>
+        </article>
+      </div>
+      <div v-else class="sae-companies-table mt-5 overflow-hidden rounded-2xl border border-app-border">
         <div class="hidden overflow-x-auto lg:block">
           <table class="min-w-full divide-y divide-app-border">
             <thead class="bg-app-surface"><tr>
@@ -133,7 +145,7 @@ function openTeam(company) {
               <th class="px-5 py-4 text-right text-xs font-black uppercase tracking-wider text-app-muted">Ações</th>
             </tr></thead>
             <tbody class="divide-y divide-app-border bg-app-bg">
-              <tr v-for="company in companies" :key="keyOf(company)" class="transition hover:bg-app-surface/70">
+              <tr v-for="company in companies" :key="keyOf(company)" class="sae-company-row transition hover:bg-app-surface/70">
                 <td class="px-5 py-4"><p class="font-bold text-app-text">{{ company.corporate_name }}</p><p v-if="company.trade_name" class="mt-1 text-xs text-app-muted">{{ company.trade_name }}</p></td>
                 <td class="px-5 py-4 text-sm text-app-muted">{{ cnpjDisplay(company.cnpj) }}</td>
                 <td class="px-5 py-4 text-sm text-app-muted">Grau {{ company.risk_grade }}</td>
@@ -167,4 +179,11 @@ function openTeam(company) {
 
 <style scoped>
 .action-button { display:inline-flex; width:2.25rem; height:2.25rem; align-items:center; justify-content:center; border:1px solid rgb(var(--color-border)); border-radius:.75rem; background:rgb(var(--color-surface)); color:rgb(var(--color-muted)); transition:color .15s; }
+</style>
+
+<style scoped>
+.sae-company-card {background:rgb(var(--color-surface-strong));border-top:3px solid rgb(var(--color-primary) / .70);box-shadow:0 5px 18px rgb(0 0 0 / .045);transition:transform .15s,border-color .15s;}
+.sae-company-card:hover { transform:translateY(-2px);border-color:rgb(var(--color-primary) / .55); }
+.sae-companies-table thead { background:rgb(var(--color-primary-soft) / .45); }
+.sae-company-row:hover { background:rgb(var(--color-primary-soft) / .28); }
 </style>

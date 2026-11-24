@@ -33,7 +33,7 @@ class AsoMonitoringService
                         $counts[$link->is_away ? 'away' : 'active']++;
                         $aso = $latest->get($link->id);
                         if (!$aso) { $counts['without_aso']++; continue; }
-                        if (!$aso->esocial_submitted) $counts['transmission_pending']++;
+                        if ($aso->esocial_submitted === false) $counts['transmission_pending']++;
                         // For now, the next_due_at is required for a trustworthy expiration alert.
                         if (!$aso->next_due_at) { $counts['without_aso']++; continue; }
                         $due = CarbonImmutable::parse($aso->next_due_at);
